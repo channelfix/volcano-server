@@ -1,10 +1,12 @@
-<h1>Hello World</h1>
+<pre></pre>
 
 <script src="/static/lib/volcano.js"></script>
 <script>
+    const pre = document.querySelector('pre');
+
     volcano.ready(() => {
         volcano.database.ref('users').on('change', value => {
-            console.log(value);
+            pre.textContent = JSON.stringify(value, null, '    ');
         });
 
         volcano.database.ref('users/me').set('hello');
