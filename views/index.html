@@ -2,5 +2,11 @@
 
 <script src="/static/lib/websockets.js"></script>
 <script>
-    console.log(websockets);
+    const origin = location.origin;
+    const ws = websockets(`ws://${location.host}/ws`);
+
+    ws.socket.addEventListener('open', () => {
+        ws.emit('test', 'hello from client');
+        ws.on('test', console.log);
+    });
 </script>

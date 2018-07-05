@@ -21,7 +21,9 @@ const ws = websockets({
     path: '/ws'
 });
 
-ws.on('test', data => {
-    console.log(data);
-    ws.emit('test', 'hello from server');
+ws.on('connection', socket => {
+    socket.on('test', data => {
+        console.log(data);
+        socket.emit('test', 'hello from server');
+    });
 });
