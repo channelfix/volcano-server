@@ -31,7 +31,15 @@ ws.on('connection', socket => {
         const target = getObject(db, segments.slice(0, segments.length - 1));
         target[segments[segments.length - 1]] = value;
 
-        socket.emit('change', db);
+        for (let i = 1; i <= segments.length; i++) {
+            const subpath = segments.slice(0, i);
+            socket.emit('change', {
+                path: subpath.join('/'),
+                value: getObject(db, subpath)
+            });
+        }
+
+        notifyChange(socket, segments, value);
     });
 });
 
@@ -47,4 +55,18 @@ function getObject(source, segments) {
     }
 
     return getObject(source[first], segments.slice(1));
+}
+
+function notifyChange(socket, segments, value) {
+    if (typeof value === 'object') {
+        Object.keys(value).forEach(key => {
+            const keyValue = value[key];
+            notifyChange(socket, [...segments, key], keyValue);
+        });
+    } else {
+        socket.emit('change', {
+            path: segments.join('/'),
+            value: value
+        });
+    }
 }
