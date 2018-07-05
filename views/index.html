@@ -3,7 +3,7 @@
 <script src="/static/lib/websockets.js"></script>
 <script>
     const origin = location.origin;
-    const ws = websockets(`ws://${location.host}/ws`);
+    const ws = websockets(`wss://${location.host}/ws`);
 
     ws.socket.addEventListener('open', () => {
         ws.on('connect', console.log);
