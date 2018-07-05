@@ -39,6 +39,11 @@ ws.on('connection', socket => {
         target[segments[segments.length - 1]] = value;
 
         clients.forEach(client => {
+            client.emit('change', {
+                path: '',
+                value: db
+            });
+
             for (let i = 1; i <= segments.length; i++) {
                 const subpath = segments.slice(0, i);
                 client.emit('change', {
@@ -47,7 +52,9 @@ ws.on('connection', socket => {
                 });
             }
 
-            notifyChange(client, segments, value);
+            if (typeof value === 'object') {
+                notifyChange(client, segments, value);
+            }
         });
     });
 });

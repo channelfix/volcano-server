@@ -1,23 +1,12 @@
 <h1>Hello World</h1>
 
-<script src="/static/lib/websockets.js"></script>
+<script src="/static/lib/volcano.js"></script>
 <script>
-    const origin = location.origin;
-    const ws = websockets(`wss://${location.host}/ws`);
-
-    ws.socket.addEventListener('open', () => {
-        ws.on('connect', console.log);
-
-        ws.emit('set', {
-            path: 'users/me/posts',
-            value: {
-                title: 'Hello World',
-                content: 'Lorem ipsum dolor sit amet'
-            }
-        });
-
-        ws.on('change', value => {
+    volcano.ready(() => {
+        volcano.database.ref('users').on('change', value => {
             console.log(value);
         });
+
+        volcano.database.ref('users/me').set('hello');
     });
 </script>
