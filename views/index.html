@@ -6,7 +6,18 @@
     const ws = websockets(`ws://${location.host}/ws`);
 
     ws.socket.addEventListener('open', () => {
-        ws.emit('test', 'hello from client');
-        ws.on('test', console.log);
+        ws.on('connect', console.log);
+
+        ws.emit('set', {
+            path: 'users/me/posts',
+            value: {
+                title: 'Hello World',
+                content: 'Lorem ipsum dolor sit amet'
+            }
+        });
+
+        ws.on('change', value => {
+            console.log(value);
+        });
     });
 </script>
