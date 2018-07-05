@@ -22,8 +22,15 @@ const ws = websockets({
 });
 
 let db = {};
+let clients = [];
 
 ws.on('connection', socket => {
+    clients.push(socket);
+
+    socket.on('close', () => {
+        clients = clients.filter(client => client !== socket);
+    });
+
     socket.emit('connect', 'You are now connected to the volcano server.');
 
     socket.on('set', ({path, value}) => {
@@ -31,15 +38,17 @@ ws.on('connection', socket => {
         const target = getObject(db, segments.slice(0, segments.length - 1));
         target[segments[segments.length - 1]] = value;
 
-        for (let i = 1; i <= segments.length; i++) {
-            const subpath = segments.slice(0, i);
-            socket.emit('change', {
-                path: subpath.join('/'),
-                value: getObject(db, subpath)
-            });
-        }
+        clients.forEach(client => {
+            for (let i = 1; i <= segments.length; i++) {
+                const subpath = segments.slice(0, i);
+                client.emit('change', {
+                    path: subpath.join('/'),
+                    value: getObject(db, subpath)
+                });
+            }
 
-        notifyChange(socket, segments, value);
+            notifyChange(client, segments, value);
+        });
     });
 });
 
@@ -49,7 +58,6 @@ function getObject(source, segments) {
     }
 
     const first = segments[0];
-    console.log(first);
      if (!source.hasOwnProperty(first)) {
         source[first] = {};
     }

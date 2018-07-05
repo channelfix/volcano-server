@@ -11,6 +11,10 @@ class SocketWrapper extends EventEmitter {
             const {name, data} = JSON.parse(message);
             this._localEmit(name, data);
         });
+
+        socket.on('close', () => {
+            this._localEmit('close');
+        });
     }
 
     emit(name, data) {
